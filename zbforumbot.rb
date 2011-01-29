@@ -9,7 +9,6 @@ require 'json'
 
 $muted = false
 $nick = "INSERT BOT NICK HERE"
-$nickm = "INSERT BOT NICK (MUTED) HERE"
 $bitly_user = "INSERT USERNAME HERE"
 $bitly_api = "INSERT API KEY HERE"
 
@@ -32,16 +31,6 @@ $bot = Cinch::Bot.new do
 		c.server = "irc.esper.net"
 		c.channels = ["#zettabyte"]
 		c.nick = $nick
-	end
-
-	on :message, "`mute" do |m|
-		$muted = true
-		$bot.nick = $nickm
-	end
-
-	on :message, "`unmute" do |m|
-		$muted = false
-		$bot.nick = $nick
 	end
 end
 
