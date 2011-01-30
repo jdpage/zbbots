@@ -49,11 +49,11 @@ class ForumBot
 			end
 
 			on :message, "`mute" do |m|
-				muted = true
+				#muted = true
 			end
 
 			on :message, "`unmute" do |m|
-				muted = false
+				#muted = false
 			end
 		end
 	end
