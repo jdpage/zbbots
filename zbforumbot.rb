@@ -33,8 +33,6 @@ end
 
 class ForumBot
 	def initialize server, channels, nick, password = nil
-		@muted = false
-		
 		@server = server
 		@channels = channels
 		@nick = nick
