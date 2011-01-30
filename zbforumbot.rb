@@ -32,13 +32,12 @@ class Bitly
 end
 
 class ForumBot
-	def initialize server, channels, nick, muted_nick, password = nil
+	def initialize server, channels, nick, password = nil
 		@muted = false
 		
 		@server = server
 		@channels = channels
 		@nick = nick
-		@muted_nick = muted_nick
 		@password = password
 		
 		@bot = Cinch::Bot.new do
@@ -47,35 +46,11 @@ class ForumBot
 				c.channels = channels
 				c.nick = nick
 			end
-
-			on :message, "`mute" do |m|
-				#muted = true
-			end
-
-			on :message, "`unmute" do |m|
-				#muted = false
-			end
 		end
 	end
 	
 	def nick
 		return @bot.nick
-	end
-	
-	def muted?
-		return @muted
-	end
-	
-	def muted= val
-		if val != @muted
-			if val
-				@bot.nick = @muted_nick
-			else
-				@bot.nick = @nick
-			end
-		end
-		
-		@muted = val
 	end
 	
 	def msg msg
@@ -176,7 +151,7 @@ end
 
 url_shortener = Bitly.new("USERNAME", "APIKEY")
 
-forum_bot = ForumBot.new("irc.esper.net", ["#zettabyte-test"], "testbot", "testbot-muted")
+forum_bot = ForumBot.new("irc.esper.net", ["#zettabyte-test"], "testbot")
 
 feed_reader = FeedMessager.new(forum_bot, "http://zettabyte.ws/feed.php", 30, "http://zettabyte.ws/search.php?search_id=unreadposts", url_shortener)
 
