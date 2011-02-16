@@ -88,14 +88,14 @@ class FeedMessager
 				puts "Updated. #{entries.length}/#{@feed.new_entries.length} new/total entries."
 				@feed.new_entries.clear
 				
-				if not @fbot.muted? and entries.length > 0
+				if entries.length > 0
 					puts "Sending a message..."
 					@fbot.msg build_message(entries)
 				end
 				
 				sleep(@delay)
 			rescue StandardError => err
-				puts "Exception in feed thread: " + err
+				puts "Exception in feed thread: " + err.to_s
 			end
 		end
 	end
@@ -170,7 +170,11 @@ end
 
 # Feed Reader Thread
 threads << Thread.new do
-	feed_reader.start
+	begin
+		feed_reader.start
+	rescue Exception => e
+		puts e.to_s
+	end
 end
 
 threads.each do |t|
