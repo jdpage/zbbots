@@ -1,0 +1,13 @@
+bitly:
+  user: USERNAME
+  apikey: APIKEY
+irc:
+  server: SERVER
+  channels:
+    - "#CHANNEL1"
+    - "#CHANNEL2"
+  nick: NICKNAME
+feed:
+  url: FEED_URL
+  timeout: 120 # time between checks
+  multilink: MULTIPLE_POST_AGGREGATE_LINK

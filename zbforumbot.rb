@@ -6,8 +6,10 @@ require 'feedzirra'
 require 'net/http'
 require 'uri'
 require 'json'
+require 'yaml'
 
 IRCColorPrefix = "\u0003"
+
 
 def linkify(text)
 	"\037\00302#{text}\037\003"
@@ -43,6 +45,10 @@ class ForumBot
 				c.server = server
 				c.channels = channels
 				c.nick = nick
+			end
+
+			on :message, "?safety dance" do |m|
+				m.channel.action "does the safety dance with #{m.user.nick}"
 			end
 		end
 	end
@@ -147,11 +153,13 @@ class FeedMessager
 	end
 end
 
-url_shortener = Bitly.new("USERNAME", "APIKEY")
+yml = YAML::load(File.open('zbforumbot.yaml'))
 
-forum_bot = ForumBot.new("irc.esper.net", ["#zettabyte-test"], "testbot")
+url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
-feed_reader = FeedMessager.new(forum_bot, "http://zettabyte.ws/feed.php", 30, "http://zettabyte.ws/search.php?search_id=unreadposts", url_shortener)
+forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"])
+
+feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener)
 
 threads = []
 
