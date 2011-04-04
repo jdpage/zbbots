@@ -122,7 +122,7 @@ class FeedMessager
 	end
 	
 	def fix_title title
-		return title.sub(/\A.+ [^a-zA-Z0-9?! ] /, "")
+		return title.sub(/\A.+? [^a-zA-Z0-9?!()\[\]{}\"\' ] /, "")
 	end
 	
 	def do_url url
