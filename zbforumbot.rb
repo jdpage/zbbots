@@ -164,7 +164,7 @@ class FeedMessager
 		
 		if entries.length == 1
 			e = entries.first
-			if ignore.index(e.author)
+			if @ignore.index(e.author)
 				puts "Ignored post by #{e.author}"
 				return nil
 			end
