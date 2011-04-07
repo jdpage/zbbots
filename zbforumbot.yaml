@@ -11,3 +11,7 @@ feed:
   url: FEED_URL
   timeout: 120 # time between checks
   multilink: MULTIPLE_POST_AGGREGATE_LINK
+admin:
+  ignore:
+    - USERNAME
+    - LIST

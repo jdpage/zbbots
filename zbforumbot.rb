@@ -70,13 +70,14 @@ end
 
 #http://zettabyte.ws/search.php?search_id=unreadposts
 class FeedMessager
-	def initialize fbot, feed_url, delay, multi_post_url, bitly = nil
+	def initialize fbot, feed_url, delay, multi_post_url, bitly = nil, ignore
 		@fbot = fbot
 		@latest = Time.now
 		@feed = Feedzirra::Feed.fetch_and_parse(feed_url)
 		@bitly = bitly
 		@multi_post_url = multi_post_url
 		@delay = delay
+		@ignore = ignore
 	end
 	
 	def start
@@ -90,7 +91,8 @@ class FeedMessager
 				
 				if entries.length > 0
 					puts "Sending a message..."
-					@fbot.msg build_message(entries)
+					mesg = build_message(entries)
+					@fbot.msg mesg if mesg
 				end
 				
 				sleep(@delay)
@@ -140,6 +142,10 @@ class FeedMessager
 		
 		if entries.length == 1
 			e = entries.first
+			if e.author in ignore
+				puts "Ignored post by #{e.author}"
+				return nil
+			end
 			msg += "#{e.author} posted in #{e.categories[0]} - #{fix_title e.title}"
 			url = do_url e.url
 		else
@@ -159,7 +165,7 @@ url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
 forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"])
 
-feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener)
+feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
 
 threads = []
 
