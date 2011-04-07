@@ -142,7 +142,7 @@ class FeedMessager
 		
 		if entries.length == 1
 			e = entries.first
-			if e.author in ignore
+			if ignore.index(e.author)
 				puts "Ignored post by #{e.author}"
 				return nil
 			end
