@@ -55,6 +55,21 @@ class Bitly
 	end
 end
 
+def dice_roll m, str
+	puts str
+	if str =~ /^(\d+)d(\d+)([+-]\d*)?$/
+		n = $1.to_i
+		d = $2.to_i
+		s = $3.to_i
+		sum = rand(d * n - n + 1) + n + s
+		m.channel.send "#{m.user.nick} rolls a #{sum}!"
+	elsif str == "cigarette"
+		m.channel.send "Roll your own, #{m.user.nick}"
+	else
+		m.channel.action "thinks that #{m.user.nick} has messed up the syntax."
+	end
+end
+
 class ForumBot
 	def initialize server, channels, nick, password = nil
 		@server = server
@@ -71,6 +86,10 @@ class ForumBot
 
 			on :message, "?safety dance" do |m|
 				m.channel.action "does the safety dance with #{m.user.nick}"
+			end
+
+			on :message, /^\?roll (.*)$/ do |m, roll|
+				dice_roll m, roll
 			end
 		end
 	end
