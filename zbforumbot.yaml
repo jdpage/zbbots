@@ -7,6 +7,8 @@ irc:
     - "#CHANNEL1"
     - "#CHANNEL2"
   nick: NICKNAME
+  user: USERNAME
+  password: PASSWORD
 feed:
   url: FEED_URL
   timeout: 120 # time between checks

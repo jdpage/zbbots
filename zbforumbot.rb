@@ -24,6 +24,7 @@
 
 require 'rubygems'
 require 'cinch'
+require 'cinch/plugins/identify'
 require 'feedzirra'
 require 'net/http'
 require 'uri'
@@ -56,27 +57,53 @@ class Bitly
 	end
 end
 
+def dice_roll m, str
+	puts str
+	if str =~ /^(\d+)d(\d+)([+-]\d*)?$/
+		n = $1.to_i
+		d = $2.to_i
+		s = $3.to_i
+		sum = rand(d * n - n + 1) + n + s
+		m.channel.send "#{m.user.nick} rolls a #{sum}!"
+	elsif str == "cigarette"
+		m.channel.send "Roll your own, #{m.user.nick}"
+	else
+		m.channel.action "thinks that #{m.user.nick} has messed up the syntax."
+	end
+end
+
 class ForumBot
-	def initialize server, log, channels, nick, password = nil
+	def initialize server, log, channels, nick, username, password = nil
 		@server = server
 		@log = log
 		@channels = channels
 		@nick = nick
 		@password = password
+		@username = username
 		
 		@bot = Cinch::Bot.new do
 			configure do |c|
 				c.server = server
 				c.channels = channels
 				c.nick = nick
+				c.plugins.plugins = [Cinch::Plugins::Identify]
+				c.plugins.options[Cinch::Plugins::Identify] = {
+					:username => username,
+					:password => password,
+					:type => :nickserv
+				}
 			end
 
-			on :message, "?safety dance" do |m|
+			on :message, /^\?safety dance/ do |m|
 				m.channel.action "does the safety dance with #{m.user.nick}"
 			end
 
 			on :message do |m|
 				@log.log m
+			end
+
+			on :message, /^\?roll (.*)$/ do |m, roll|
+				dice_roll m, roll
 			end
 		end
 	end
@@ -126,6 +153,7 @@ class FeedMessager
 				sleep(@delay)
 			rescue StandardError => err
 				puts "Exception in feed thread: " + err.to_s
+				return # drop to fix.
 			end
 		end
 	end
@@ -231,9 +259,7 @@ yml = YAML::load(File.open('zbforumbot.yaml'))
 
 url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
-forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"])
-
-feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
+forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
 
 threads = []
 
@@ -244,10 +270,14 @@ end
 
 # Feed Reader Thread
 threads << Thread.new do
-	begin
-		feed_reader.start
-	rescue Exception => e
-		puts e.to_s
+	loop do
+		puts "Building new feedreader!"
+		feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
+		begin
+			feed_reader.start
+		rescue Exception => e
+			puts "error outside feedreader! #{e.to_s}"
+		end
 	end
 end
 
