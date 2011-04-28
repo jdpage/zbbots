@@ -104,6 +104,14 @@ class ForumBot
 			on :message, /^\?roll (.*)$/ do |m, roll|
 				dice_roll m, roll
 			end
+
+			on :private, /^shorten (.+) (.+)$/ do |m, channel, url|
+				if url == "" or channel == "" or not url or not channel
+					m.user.send "syntax: shorten <channel> <url>"
+				end
+				short = $shortener.shorten url
+				Channel(channel).send "#{m.user} posted a link: #{short}"
+			end
 		end
 	end
 	
@@ -260,7 +268,7 @@ db = Sequel.sqlite(yml["local"]["database"]);
 
 $logger = ChatLog.new db
 
-url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
+$url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
 forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
 
@@ -275,7 +283,7 @@ end
 threads << Thread.new do
 	loop do
 		puts "Building new feedreader!"
-		feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
+		feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], $url_shortener, yml["admin"]["ignore"])
 		begin
 			feed_reader.start
 		rescue Exception => e
