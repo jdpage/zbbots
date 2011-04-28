@@ -147,6 +147,7 @@ class FeedMessager
 				sleep(@delay)
 			rescue StandardError => err
 				puts "Exception in feed thread: " + err.to_s
+				return # drop to fix.
 			end
 		end
 	end
@@ -214,8 +215,6 @@ url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
 forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
 
-feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
-
 threads = []
 
 # IRC Bot Thread
@@ -225,10 +224,14 @@ end
 
 # Feed Reader Thread
 threads << Thread.new do
-	begin
-		feed_reader.start
-	rescue Exception => e
-		puts e.to_s
+	loop do
+		puts "Building new feedreader!"
+		feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
+		begin
+			feed_reader.start
+		rescue Exception => e
+			puts "error outside feedreader! #{e.to_s}"
+		end
 	end
 end
 
