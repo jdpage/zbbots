@@ -227,7 +227,7 @@ class ChatLog
 			@users.insert(:nickserv => authname)
 		end
 
-		return @users.select(:id).filter(:nickserv => authname).first
+		return @users.select(:id).filter(:nickserv => authname).first[:id]
 	end
 
 	def log m
@@ -239,12 +239,12 @@ class ChatLog
 
 	def guess nick
 		# nick is probably the same as the username
-		uid = @users.select(:id).filter(:nickserv => nick).first
+		uid = @users.select(:id).filter(:nickserv => nick).first[:id]
 		return uid if uid
 		best = nil
 		nbest = -1
 		@messages.distinct(:user).filter(:nick => nick).each do |u|
-			n = @messages.select(:count.sql_function(:id)).filter(:nick => nick, :user => u).first
+			n = @messages.select(:count.sql_function(:id)).filter(:nick => nick, :user => u).first.to_a[0][1]
 			if n > nbest
 				best = u
 				nbest = n
