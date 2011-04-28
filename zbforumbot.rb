@@ -24,6 +24,7 @@
 
 require 'rubygems'
 require 'cinch'
+require 'cinch/plugins/identify'
 require 'feedzirra'
 require 'net/http'
 require 'uri'
@@ -71,20 +72,27 @@ def dice_roll m, str
 end
 
 class ForumBot
-	def initialize server, channels, nick, password = nil
+	def initialize server, channels, nick, username, password = nil
 		@server = server
 		@channels = channels
 		@nick = nick
 		@password = password
+		@username = username
 		
 		@bot = Cinch::Bot.new do
 			configure do |c|
 				c.server = server
 				c.channels = channels
 				c.nick = nick
+				c.plugins.plugins = [Cinch::Plugins::Identify]
+				c.plugins.options[Cinch::Plugins::Identify] = {
+					:username => username,
+					:password => password,
+					:type => :nickserv
+				}
 			end
 
-			on :message, "?safety dance" do |m|
+			on :message, /^\?safety dance/ do |m|
 				m.channel.action "does the safety dance with #{m.user.nick}"
 			end
 
@@ -204,7 +212,7 @@ yml = YAML::load(File.open('zbforumbot.yaml'))
 
 url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
-forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"])
+forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
 
 feed_reader = FeedMessager.new(forum_bot, yml["feed"]["url"], yml["feed"]["timeout"], yml["feed"]["multilink"], url_shortener, yml["admin"]["ignore"])
 
