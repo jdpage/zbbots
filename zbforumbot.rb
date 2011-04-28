@@ -29,6 +29,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'yaml'
+require 'sequel'
 
 IRCColorPrefix = "\u0003"
 
@@ -56,8 +57,9 @@ class Bitly
 end
 
 class ForumBot
-	def initialize server, channels, nick, password = nil
+	def initialize server, log, channels, nick, password = nil
 		@server = server
+		@log = log
 		@channels = channels
 		@nick = nick
 		@password = password
@@ -71,6 +73,10 @@ class ForumBot
 
 			on :message, "?safety dance" do |m|
 				m.channel.action "does the safety dance with #{m.user.nick}"
+			end
+
+			on :message do |m|
+				@log.log m
 			end
 		end
 	end
@@ -178,6 +184,46 @@ class FeedMessager
 		msg += " (#{linkify url}" + IRCColorPrefix + "5)"
 		
 		return msg
+	end
+end
+
+class ChatLog
+	def initialize db
+		@messages = db[:messages]
+		@users = db[:users]
+	end
+
+	def user authname
+		authname = "" if not authname
+
+		if @users.select(:id).filter(:nickserv => authname).count == 0
+			@users.insert(:nickserv => authname)
+		end
+
+		return @users.select(:id).filter(:nickserv => authname).first
+	end
+
+	def log m
+		@messages.insert(:time => Time.now,
+				 :text => m.message, 
+				 :nick => m.user.nick,
+				 :user => user(m.user.authname))
+	end
+
+	def guess nick
+		# nick is probably the same as the username
+		uid = @users.select(:id).filter(:nickserv => nick).first
+		return uid if uid
+		best = nil
+		nbest = -1
+		@messages.distinct(:user).filter(:nick => nick).each do |u|
+			n = @messages.select(:count.sql_function(:id)).filter(:nick => nick, :user => u).first
+			if n > nbest
+				best = u
+				nbest = n
+			end
+		end
+		return best
 	end
 end
 
