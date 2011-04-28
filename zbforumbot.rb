@@ -257,9 +257,13 @@ end
 
 yml = YAML::load(File.open('zbforumbot.yaml'))
 
+db = Sequel.sqlite(yml["local"]["database"]);
+
+logger = ChatLog.new db
+
 url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
-forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
+forum_bot = ForumBot.new(yml["irc"]["server"], logger, yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
 
 threads = []
 
