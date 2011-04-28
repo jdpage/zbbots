@@ -73,9 +73,8 @@ def dice_roll m, str
 end
 
 class ForumBot
-	def initialize server, log, channels, nick, username, password = nil
+	def initialize server, channels, nick, username, password = nil
 		@server = server
-		@log = log
 		@channels = channels
 		@nick = nick
 		@password = password
@@ -99,7 +98,7 @@ class ForumBot
 			end
 
 			on :message do |m|
-				@log.log m
+				$logger.log m
 			end
 
 			on :message, /^\?roll (.*)$/ do |m, roll|
@@ -259,11 +258,11 @@ yml = YAML::load(File.open('zbforumbot.yaml'))
 
 db = Sequel.sqlite(yml["local"]["database"]);
 
-logger = ChatLog.new db
+$logger = ChatLog.new db
 
 url_shortener = Bitly.new(yml["bitly"]["user"], yml["bitly"]["apikey"])
 
-forum_bot = ForumBot.new(yml["irc"]["server"], logger, yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
+forum_bot = ForumBot.new(yml["irc"]["server"], yml["irc"]["channels"], yml["irc"]["nick"], yml["irc"]["user"], yml["irc"]["password"])
 
 threads = []
 
