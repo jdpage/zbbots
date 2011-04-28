@@ -109,7 +109,7 @@ class ForumBot
 				if url == "" or channel == "" or not url or not channel
 					m.user.send "syntax: shorten <channel> <url>"
 				end
-				short = $shortener.shorten url
+				short = $url_shortener.shorten url
 				Channel(channel).send "#{m.user} posted a link: #{short}"
 			end
 		end
