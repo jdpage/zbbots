@@ -19,6 +19,6 @@ class LinkTitles
 		end
 		doc = Hpricot(response)
 
-		return (doc/"/html/head/title").inner_html
+		return (doc/"/html/head/title").inner_html.gsub /\s+/, " "
 	end
 end
