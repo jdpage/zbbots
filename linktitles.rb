@@ -6,7 +6,7 @@ require 'hpricot'
 class LinkTitles
 	include Cinch::Plugin
 
-	match /http:\/\/.+?(?=\s|$)/
+	match /(http:\/\/.+?(?=\s|$))/
 
 	def execute(m, url)
 		m.channel.send "title of #{url} is #{LinkTitles.fetch_title url}"
