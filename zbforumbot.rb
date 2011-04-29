@@ -112,7 +112,7 @@ class ForumBot
 				end
 				url = "http://#{url}" if url[0..6] != "http://"
 				short = $url_shortener.shorten url
-				Channel(channel).send "#{m.user} posted a link: #{short}"
+				Channel(channel).send "#{m.user} sent #{LinkTitles.fetch_title url} (#{short})"
 			end
 		end
 	end

@@ -6,7 +6,7 @@ require 'hpricot'
 class LinkTitles
 	include Cinch::Plugin
 
-	match /(https?:\/\/.+?)(?=\s|,|$)/, {:use_prefix => false}
+	match /(https?:\/\/.+?)(?=[\s(){}\[\]<>"'\\]|$)/i, {:use_prefix => false}
 
 	def execute(m, url)
 		m.reply "title of #{url} is #{LinkTitles.fetch_title url}"
