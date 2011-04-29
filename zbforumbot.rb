@@ -31,6 +31,7 @@ require 'uri'
 require 'json'
 require 'yaml'
 require 'sequel'
+require 'linktitles'
 
 IRCColorPrefix = "\u0003"
 
@@ -85,7 +86,7 @@ class ForumBot
 				c.server = server
 				c.channels = channels
 				c.nick = nick
-				c.plugins.plugins = [Cinch::Plugins::Identify]
+				c.plugins.plugins = [Cinch::Plugins::Identify, LinkTitles]
 				c.plugins.options[Cinch::Plugins::Identify] = {
 					:username => username,
 					:password => password,
