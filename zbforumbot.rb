@@ -31,7 +31,7 @@ require 'uri'
 require 'json'
 require 'yaml'
 require 'sequel'
-require 'linktitles'
+require_relative 'linktitles'
 
 IRCColorPrefix = "\u0003"
 
