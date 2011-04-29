@@ -32,6 +32,7 @@ require 'json'
 require 'yaml'
 require 'sequel'
 require_relative 'linktitles'
+require_relative 'dice'
 
 IRCColorPrefix = "\u0003"
 
@@ -58,21 +59,6 @@ class Bitly
 	end
 end
 
-def dice_roll m, str
-	puts str
-	if str =~ /^(\d+)d(\d+)([+-]\d*)?$/
-		n = $1.to_i
-		d = $2.to_i
-		s = $3.to_i
-		sum = rand(d * n - n + 1) + n + s
-		m.channel.send "#{m.user.nick} rolls a #{sum}!"
-	elsif str == "cigarette"
-		m.channel.send "Roll your own, #{m.user.nick}"
-	else
-		m.channel.action "thinks that #{m.user.nick} has messed up the syntax."
-	end
-end
-
 class ForumBot
 	def initialize server, channels, nick, username, password = nil
 		@server = server
@@ -86,7 +72,7 @@ class ForumBot
 				c.server = server
 				c.channels = channels
 				c.nick = nick
-				c.plugins.plugins = [Cinch::Plugins::Identify, LinkTitles]
+				c.plugins.plugins = [Cinch::Plugins::Identify, LinkTitles, Dice]
 				c.plugins.options[Cinch::Plugins::Identify] = {
 					:username => username,
 					:password => password,
