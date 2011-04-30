@@ -7,6 +7,7 @@ class LinkTitles
 	include Cinch::Plugin
 
 	match /(https?:\/\/.+?)(?=[\s(){}\[\]<>"'\\]|$)/i, {:use_prefix => false}
+	react_on :channel
 
 	def execute(m, url)
 		m.reply "title of #{url} is #{LinkTitles.fetch_title url}"

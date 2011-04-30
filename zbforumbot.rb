@@ -88,6 +88,10 @@ class ForumBot
 				$logger.log m
 			end
 
+			on :message, /^\?guess (.*)$/ do |m, nick|
+				m.reply "guessing user \"#{$logger.guess nick}\""
+			end
+
 			on :message, /^\?roll (.*)$/ do |m, roll|
 				dice_roll m, roll
 			end
