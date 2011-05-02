@@ -92,10 +92,6 @@ class ForumBot
 				m.reply "guessing user \"#{$logger.guess nick}\""
 			end
 
-			on :message, /^\?roll (.*)$/ do |m, roll|
-				dice_roll m, roll
-			end
-
 			on :private, /^shorten (.+) (.+)$/ do |m, channel, url|
 				if url == "" or channel == "" or not url or not channel
 					m.user.send "syntax: shorten <channel> <url>"

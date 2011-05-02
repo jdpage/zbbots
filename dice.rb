@@ -5,6 +5,7 @@ class Dice
 	include Cinch::Plugin
 
 	match /roll (\d.)d(\d+)([+-]\d+)?/
+	prefix "?"
 
 	def execute m, num, sides, diff
 		n = num.to_i
